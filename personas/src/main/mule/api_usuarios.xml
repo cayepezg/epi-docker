@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <http:listener-config name="api_usuarios-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="api_usuarios-config" api="api_usuarios.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="782ae428-835e-49eb-a63d-fc45c24e9dea">
+        <db:my-sql-connection host="db" port="3306" user="root" password="epi_password" database="epi_db" />
+    </db:config>
+    <!-- <validation:config name="Validation_Config" doc:name="Validation Config" doc:id="1d985174-0889-476c-943a-3031f88ffc14" /> -->
+    <flow name="api_usuarios-main">
+        <http:listener config-ref="api_usuarios-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api_usuarios-config" />
+    </flow>
+    <flow name="api_usuarios-console">
+        <http:listener config-ref="api_usuarios-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api_usuarios-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND" />
+        </error-handler>
+    </flow>
+    <flow name="get:\users_html:api_usuarios-config">
+        <logger level="INFO" message="get:\users_html:api_usuarios-config" />
+    </flow>
+    <flow name="post:\persona:application\json:api_usuarios-config">
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="aa5d3d2c-0ede-46dd-8943-bbe3c9d88200" variableName="entrada" />
+        <db:insert doc:name="Insert Persona" doc:id="41a47634-86cd-4c1f-8bf9-a96836d09d8a" config-ref="Database_Config" autoGenerateKeys="true">
+            <db:sql><![CDATA[insert into persona (identificador, nombre, apellido, sexo)
+	values (:identificador, :nombre, :apellido, :sexo)]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+	"identificador": vars.entrada.identificador,
+	"nombre": vars.entrada.nombre,
+	"apellido": vars.entrada.apellido,
+	"sexo": vars.entrada.sexo
+}]]]></db:input-parameters>
+        </db:insert>
+        <db:query-single doc:name="Query single" doc:id="83515154-54a1-4790-b096-1bef7498e4ed" config-ref="Database_Config">
+            <db:sql><![CDATA[select *
+	from persona
+	where identificador = :identificador]]></db:sql>
+            <db:input-parameters><![CDATA[#[{'identificador': vars.entrada.identificador}]]]></db:input-parameters>
+        </db:query-single>
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;payload]" doc:name="Set Payload" doc:id="cb3a06ea-466c-4ef9-8196-26d7cd54ca3b" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4907550e-0ef5-46c1-acc6-c46ff9021422" type="DB:QUERY_EXECUTION">
+                <set-variable value="500" doc:name="Set Variable" doc:id="6d5ef2c3-eabf-457c-b796-27ee08659dab" variableName="httpStatus" />
+                <set-payload value="{&quot;message&quot;:&quot;No se pudo realizar el insert&quot;}" doc:name="Set Payload" doc:id="453ca88c-cfc5-4582-b80c-7b07db8a0db6" mimeType="application/json" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="get:\persona:api_usuarios-config">
+        <db:query-single doc:name="Query single" doc:id="c16e9b00-3e6e-4df8-8d0c-2c4a2ad9e49f" config-ref="Database_Config">
+            <db:sql><![CDATA[select *
+	from persona
+	where identificador = :identificador]]></db:sql>
+            <db:input-parameters><![CDATA[#[{'id': attributes.queryParams.id, 'identificador': attributes.queryParams.identificador}]]]></db:input-parameters>
+        </db:query-single>
+        <validation:is-not-null doc:id="3754be40-5e34-42bc-98fd-c16dc24c13b3" doc:name="DataValidator" value="#[payload.id]" message="No hay resultados coincidentes" />
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;payload]" doc:name="Set Payload" doc:id="684b851d-40fc-4285-8d5a-31fcfaec406c" />
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="21a04a74-97df-480a-b9f4-5c6892bdd30b" type="VALIDATION:NULL">
+                <set-variable value="404" doc:name="Set Variable" doc:id="ad6c93af-94c8-41fc-a834-8c0146b8b1d1" variableName="httpStatus" />
+                <set-payload value="{&quot;message&quot;:&quot;No se econtraron registros coincidentes&quot;}" doc:name="Set Payload" doc:id="3db17105-41c8-4a94-98a4-dbaf6a8ecf03" mimeType="application/json" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+    <flow name="put:\persona\(identificador):application\json:api_usuarios-config">
+        <set-variable value="#[attributes.uriParams.identificador]" doc:name="Set Variable" doc:id="55afa567-7838-41d4-b61d-89b1d58691f2" variableName="identificador" />
+        <db:update doc:name="Actualiza Persona" doc:id="f15c9bb3-1821-4727-af2d-506ef9eb22dd" config-ref="Database_Config">
+            <db:sql><![CDATA[update persona set 
+	nombre = :nombre, 
+	apellido = :apellido, 
+	sexo = :sexo
+where
+	identificador = :identificador]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+	"identificador": vars.identificador,
+	"nombre": payload.nombre,
+	"apellido": payload.apellido,
+	"sexo": payload.sexo
+}]]]></db:input-parameters>
+        </db:update>
+        <db:query-single doc:name="Query single" doc:id="afc8651f-9bb5-4867-adf5-d093e7129819" config-ref="Database_Config">
+            <db:sql><![CDATA[select *
+	from persona
+	where identificador = :identificador]]></db:sql>
+            <db:input-parameters><![CDATA[#[{'identificador': vars.identificador }]]]></db:input-parameters>
+        </db:query-single>
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;payload]" doc:name="Copy_of_Set Payload" doc:id="7cf1c344-19a7-4a1e-8049-66acd6708b0a" />
+    </flow>
+    <flow name="delete:\persona\(identificador):api_usuarios-config">
+        <db:delete doc:name="Borrar Persona" doc:id="efc40c6d-59fa-4c21-9cd5-21363ebe7980" config-ref="Database_Config">
+            <db:sql><![CDATA[delete from persona where identificador = :identificador]]></db:sql>
+            <db:input-parameters><![CDATA[#[{identificador: attributes.uriParams.identificador}]]]></db:input-parameters>
+        </db:delete>
+        <validation:is-true doc:name="Is true" doc:id="518ed001-1f75-43dd-aa14-0438ceeb9082" expression="true" />
+        <set-payload value="#[%dw 2.0&#xA;output application/json&#xA;---&#xA;{&#xA; &quot;message&quot;: &quot;Registro eliminado exitosamente&quot;&#xA;}]" doc:name="Set Payload" doc:id="84af71c5-e322-4531-9604-a3cf48d3428d" />
+    </flow>
+    <flow name="get:\persona\html:api_usuarios-config">
+        <db:select doc:name="Select" doc:id="04e788c1-bda6-45ec-aa93-801cc65de976" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from persona]]></db:sql>
+		</db:select>
+		<set-payload value='#[%dw 2.0 &#10;output text/plain &#10;---&#10;"&lt;h1&gt;" ++ "Consultado por Mule Server: " ++ (now() as String {format : "dd-MM-yyyy HH:mm:ss"}) ++ &#10;"&lt;/h1&gt;\n" &#10;	++ "&lt;table&gt;&#10;		\n\t&lt;tr&gt;\n\t\t&lt;th&gt;ID&lt;/th&gt;\n\t\t&lt;th&gt;Identificador&lt;/th&gt;\n\t\t&lt;th&gt;Nombre&lt;/th&gt;\n\t\t&lt;th&gt;Apellido&lt;/th&gt;\n\t&#10;			&lt;/tr&gt;\n" ++ ( (payload map ( pay , index ) -&gt; {&#10;				"row" : "\t&lt;tr&gt;\n\t\t&lt;td&gt;" ++ pay.id  ++ "&lt;/td&gt;\n" &#10;				++ "\t\t&lt;td&gt;" ++ pay.identificador  ++ "&lt;/td&gt;\n" ++           "\t\t&lt;td&gt;" &#10;				++ pay.nombre ++ "&lt;/td&gt;\n" ++          "\t\t&lt;td&gt;" &#10;				++ pay.apellido  ++ "&lt;/td&gt;\n\t&lt;/tr&gt;\n" }.row) joinBy ("")) ++ "\n&lt;/table&gt;"]' doc:name="Set Payload" doc:id="bd5caf80-1978-475d-a428-8d119d0c13a3" />
+    </flow>
+</mule>

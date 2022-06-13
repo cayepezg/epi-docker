@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+
+    db:
+        image: mysql:8.0.29 
+        restart: always
+        container_name: db 
+        hostname: db 
+        ports:
+            - 3306:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=epi_password
+            - MYSQL_DATABASE=epi_db
+            - TZ=America/Caracas
+        volumes:
+            - ./data_containers/mysql:/var/lib/mysql
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "10"
+
+    db_client:
+        image: phpmyadmin:5.2.0-apache
+        restart: always
+        container_name: db_client
+        hostname: db_client
+        ports:
+            - 90:80
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=db
+            - PMA_USER=root
+            - PMA_PASSWORD=epi_password
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "10"
+

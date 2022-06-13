@@ -1,0 +1,6 @@
+data_containers/
+personas/target/
+.mule/
+.metadata/
+.tooling-apps-cache/
+.tooling/

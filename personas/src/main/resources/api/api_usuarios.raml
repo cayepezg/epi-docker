@@ -1,0 +1,90 @@
+#%RAML 1.0
+title: Usuarios
+version: 1.0
+
+types:
+  Persona: !include datatype/persona.raml
+
+
+/users_html:
+  get:
+    displayName: Get Users
+    
+    responses:
+      200:
+        body:
+          plain/text:
+            type: string
+                   
+/persona:
+  get:
+    displayName: Get Persona
+    queryParameters:
+      identificador:
+        displayName: Número de identificador Personal.
+        type: string
+        required: false
+        description: Número de documento de identidad.
+        default: nil
+    
+    responses:
+      200:
+        body:
+          application/json:
+            type: object
+            example: !include examples/PersonaExample.raml
+      400:
+        body:
+          application/json:
+            example: {"message": "No se encontraron resultados coincidentes con su búsqueda."}
+            
+  post:
+    displayName: Post Persona
+    body:
+      application/json:
+        type: Persona
+        example:
+          value: 
+            identificador: "00000001"
+            nombre: "Jhon"
+            apellido: "Doe"
+            sexo: "M"
+    responses:
+      200:
+        body:
+          application/json:
+            type: object
+            example: !include examples/PersonaExample.raml
+  /html:
+    get:
+      displayName: Get HtmlPersonas
+      responses:
+        200:
+          body:
+            application/json:
+              type: string            
+      
+  /{identificador}:
+    delete:
+      displayName: Delete Persona
+      responses:
+        200:
+          description: "Registro eliminado exitosamente"
+  
+    put:
+      displayName: Update Persona
+      body:
+        application/json:
+          type: Persona
+          example:
+            value:
+              identificador: "00000001"
+              nombre: "Jhon"
+              apellido: "Doe"
+              sexo: "M"
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              example: !include examples/PersonaExample.raml

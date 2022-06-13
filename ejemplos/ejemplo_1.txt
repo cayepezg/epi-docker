@@ -1,0 +1,14 @@
+
+# Levanta un contendor para dar la hora.
+docker run --rm alpine:3.16 date
+
+# No tomará en cuenta el timezone porque el contenedor no conoce como calcularlo.
+docker run --rm --env TZ=America/Caracas alpine:3.16 date
+
+# Creamos una imagen que si sepa como calcular las horas.
+docker build --tag alpine-time:1.0 .
+
+# Usamos la imagen creada.
+docker run --rm --env TZ=America/Caracas alpine-time:1.0 date
+
+

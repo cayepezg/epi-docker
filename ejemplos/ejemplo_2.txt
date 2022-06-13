@@ -1,0 +1,52 @@
+# Contenedor atachado al terminal
+docker run --rm \
+    --name db \
+    --hostname db\
+    --expose 3306 \
+    --env MYSQL_ROOT_PASSWORD=epi_password \
+    --env MYSQL_DATABASE=epi_db \
+    mysql:8.0.29
+    
+
+# Contenedor destachado.
+docker run --rm -d \
+    --name db \
+    --hostname db\
+    --publish 3306:3306 \
+    --env MYSQL_ROOT_PASSWORD=epi_password \
+    --env MYSQL_DATABASE=epi_db \
+    mysql:8.0.29
+    
+#docker exec -it db mysql -p
+#show databases;
+#connect epi_bd;
+#show tables;
+
+
+# Crea una red  que permite conexión de red privada entre contenedores.
+docker network create default_network
+
+#persistiendo data
+docker run --rm -d \
+    --name db \
+    --hostname db \
+    --network default_network \
+    --publish 3306:3306 \
+    --env MYSQL_ROOT_PASSWORD=epi_password \
+    --env MYSQL_DATABASE=epi_db \
+    --volume /Desarollos/docker-test/data_containers/mysql:/var/lib/mysql \
+    mysql:8.0.29
+    
+
+docker run --rm -d \
+    --name db_client \
+    --hostname db_client\
+    --network default_network \
+    --env PMA_ARBITRARY=1 \
+    --env PMA_HOST=db \
+    --env PMA_USER=root \
+    --env PMA_PASSWORD=epi_password \
+    --publish 90:80 \
+    phpmyadmin:5.2.0-apache
+    
+

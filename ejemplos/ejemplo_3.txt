@@ -1,0 +1,7 @@
+#
+docker-compose up -d
+#Crear tabla
+
+
+#
+docker-compose -f docker-compose_2.yaml up -d

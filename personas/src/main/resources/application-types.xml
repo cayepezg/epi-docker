@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="persona" format="json">
+      <types:shape format="weave" example="examples/persona.json"><![CDATA[%dw 2.0
+
+type persona = {|
+  id: Number {"typeId": "int"}, 
+  identificador: String, 
+  nombre: String, 
+  apellido: String, 
+  sexo: String
+|} {"example": "{\\\"id\\\":1,\\\"identificador\\\":\\\"123\\\",\\\"nombre\\\":\\\"Jhon\\\",\\\"apellido\\\":\\\"Doe\\\",\\\"sexo\\\":\\\"M\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+</types:mule>
