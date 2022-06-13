@@ -44,6 +44,11 @@ services:
         ports:
             - 8081:8081
         environment:
+            - DB.HOST=db
+            - DB.PORT=3306
+            - DB.USER=root
+            - DB.PASSWORD=epi_password
+            - DB.NAME=epi_db
             - TZ=America/Caracas
         volumes:
             - ./data_containers/mule/apps:/opt/mule/apps
@@ -60,7 +65,7 @@ services:
         container_name: nginx
         hostname: nginx
         ports:
-            - 70:80
+            - 80:80
         environment:
             - TZ=America/Caracas
         volumes:

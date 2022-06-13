@@ -8,12 +8,40 @@
     <button onclick="consultaPersonas()">Consultar Personas</button>
     <id id="tabla"></id>
 </body>
+<style>
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border:1px solid lightgrey;
+    color:rgb(20,20,20);
+}
+thead{
+    background-color:rgb(131, 131, 131);
+    color:white !important;
+    font-size: 1.2em;
+
+}
+tr{
+    text-align: center;
+}
+tr:nth-child(even){
+    background-color:lightgrey;
+}
+td,th{
+    padding:5px 0;
+}
+
+</style>
 <script>
 
     function consultaPersonas() {
         document.getElementById("tabla").innerHTML = ""
         
-        fetch("http://localhost:70/api/persona/html")
+        fetch("http://localhost/api/persona/html")
             .then(response => response.text())
             .then(data => {
                 document.getElementById("tabla").innerHTML = data

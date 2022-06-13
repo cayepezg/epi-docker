@@ -5,7 +5,7 @@
     </http:listener-config>
     <apikit:config name="api_usuarios-config" api="api_usuarios.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <db:config name="Database_Config" doc:name="Database Config" doc:id="782ae428-835e-49eb-a63d-fc45c24e9dea">
-        <db:my-sql-connection host="db" port="3306" user="root" password="epi_password" database="epi_db" />
+        <db:my-sql-connection host="${DB.HOST}" port="${DB.PORT}" user="${DB.USER}" password="${DB.PASSWORD}" database="${DB.NAME}" />
     </db:config>
     <!-- <validation:config name="Validation_Config" doc:name="Validation Config" doc:id="1d985174-0889-476c-943a-3031f88ffc14" /> -->
     <flow name="api_usuarios-main">
@@ -116,6 +116,6 @@ where
         <db:select doc:name="Select" doc:id="04e788c1-bda6-45ec-aa93-801cc65de976" config-ref="Database_Config">
 			<db:sql ><![CDATA[select * from persona]]></db:sql>
 		</db:select>
-		<set-payload value='#[%dw 2.0 &#10;output text/plain &#10;---&#10;"&lt;h1&gt;" ++ "Consultado por Mule Server: " ++ (now() as String {format : "dd-MM-yyyy HH:mm:ss"}) ++ &#10;"&lt;/h1&gt;\n" &#10;	++ "&lt;table&gt;&#10;		\n\t&lt;tr&gt;\n\t\t&lt;th&gt;ID&lt;/th&gt;\n\t\t&lt;th&gt;Identificador&lt;/th&gt;\n\t\t&lt;th&gt;Nombre&lt;/th&gt;\n\t\t&lt;th&gt;Apellido&lt;/th&gt;\n\t&#10;			&lt;/tr&gt;\n" ++ ( (payload map ( pay , index ) -&gt; {&#10;				"row" : "\t&lt;tr&gt;\n\t\t&lt;td&gt;" ++ pay.id  ++ "&lt;/td&gt;\n" &#10;				++ "\t\t&lt;td&gt;" ++ pay.identificador  ++ "&lt;/td&gt;\n" ++           "\t\t&lt;td&gt;" &#10;				++ pay.nombre ++ "&lt;/td&gt;\n" ++          "\t\t&lt;td&gt;" &#10;				++ pay.apellido  ++ "&lt;/td&gt;\n\t&lt;/tr&gt;\n" }.row) joinBy ("")) ++ "\n&lt;/table&gt;"]' doc:name="Set Payload" doc:id="bd5caf80-1978-475d-a428-8d119d0c13a3" />
+		<set-payload value='#[%dw 2.0 &#10;output text/plain &#10;---&#10;"&lt;h1&gt;" ++ "Consultado por Mule Server: " ++ (now() as String {format : "dd-MM-yyyy HH:mm:ss"}) ++ &#10;"&lt;/h1&gt;\n" &#10;	++ "&lt;table&gt; &lt;thead&gt;&#10;		\n\t&lt;tr&gt;\n\t\t&lt;th&gt;ID&lt;/th&gt;\n\t\t&lt;th&gt;Identificador&lt;/th&gt;\n\t\t&lt;th&gt;Nombre&lt;/th&gt;\n\t\t&lt;th&gt;Apellido&lt;/th&gt;&lt;/thead&gt;\n\t&#10;			&lt;/tr&gt;\n" ++ ( (payload map ( pay , index ) -&gt; {&#10;				"row" : "\t&lt;tr&gt;\n\t\t&lt;td&gt;" ++ pay.id  ++ "&lt;/td&gt;\n" &#10;				++ "\t\t&lt;td&gt;" ++ pay.identificador  ++ "&lt;/td&gt;\n" ++           "\t\t&lt;td&gt;" &#10;				++ pay.nombre ++ "&lt;/td&gt;\n" ++          "\t\t&lt;td&gt;" &#10;				++ pay.apellido  ++ "&lt;/td&gt;\n\t&lt;/tr&gt;\n" }.row) joinBy ("")) ++ "\n&lt;/table&gt;"]' doc:name="Set Payload" doc:id="bd5caf80-1978-475d-a428-8d119d0c13a3" />
     </flow>
 </mule>
