@@ -41,7 +41,7 @@ td,th{
     function consultaPersonas() {
         document.getElementById("tabla").innerHTML = ""
         
-        fetch("http://localhost/api/persona/html")
+        fetch("http://localhost:8080/api/persona/html")
             .then(response => response.text())
             .then(data => {
                 document.getElementById("tabla").innerHTML = data
