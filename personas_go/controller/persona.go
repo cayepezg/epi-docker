@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// swagger:operation GET /persona Persona GetPersona
+// swagger:operation GET /api/persona Persona GetPersona
 // ---
 // summary: Entrega la Persona solicitada.
 // description: Entrega la Persona solicitada.
@@ -51,7 +51,7 @@ func GetPersona(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// swagger:operation POST /persona Persona CreatePersona
+// swagger:operation POST /api/persona Persona CreatePersona
 // ---
 // summary: Crea una persona.
 // description: Crea una persona.
@@ -60,8 +60,9 @@ func GetPersona(w http.ResponseWriter, r *http.Request) {
 // parameters:
 // - name: persona
 //   in: body
+//   schema:
+//	   $ref: '#/definitions/Persona'
 //   description: Persona a Crear.
-//   type: Persona
 //   required: true
 // responses:
 //   200:
@@ -94,7 +95,7 @@ func CreatePersona(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// swagger:operation PUT /persona Persona UpdatePersona
+// swagger:operation PUT /api/persona Persona UpdatePersona
 // ---
 // summary: Actualiza una persona.
 // description: Actualiza una persona.
@@ -104,7 +105,8 @@ func CreatePersona(w http.ResponseWriter, r *http.Request) {
 // - name: persona
 //   in: body
 //   description: Persona a Actualizar.
-//   type: Persona
+//   schema:
+//	   $ref: '#/definitions/Persona'
 //   required: true
 // responses:
 //   200:
@@ -137,7 +139,7 @@ func UpdatePersona(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// swagger:operation DELETE /persona/{identificador} Persona DeletePersona
+// swagger:operation DELETE /api/persona/{identificador} Persona DeletePersona
 // ---
 // summary: Elimina una persona.
 // description: Elimina una persona.
@@ -187,8 +189,6 @@ func GetPersonasHTML(w http.ResponseWriter, r *http.Request) {
 	html, _ := servicio.GetPersonasHTML()
 
 	w.WriteHeader(http.StatusOK)
-
-	log.Println(html)
 
 	fmt.Fprint(w, html)
 

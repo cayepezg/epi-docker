@@ -14,4 +14,15 @@ API_SERVER_PORT=puerto_a_servir \
 	go run cmd/main.go
 ```
 
+## Regeneración de swagger.yaml
+Se debe ejecutar el siguiente comando, en caso de que se realicen actualizaciones en el código, que afecten la documentación del mismo
+```bash
+~/go/bin/swagger generate spec -o ./view/swagger.yaml --scan-models
+~/go/bin/swagger mixin \
+		./view/init.yml \
+		./view/swagger.yaml \
+		--format yaml \
+		-o ./view/swagger.yaml
+```
+
 go mod init personas
