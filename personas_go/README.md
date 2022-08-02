@@ -1,5 +1,4 @@
-
-## Ejecución a partir del código
+## Ejecución a partir de la fuente
 Ajustando los valores correctos de las variables, ejecutar el siguiente comando:
 ```bash
 API_SERVER_PORT=puerto_a_servir \
@@ -26,3 +25,25 @@ Se debe ejecutar el siguiente comando, en caso de que se realicen actualizacione
 ```
 
 go mod init personas
+
+
+
+## Construcción de imagen a partir de Dockerfile multi stage
+```bash
+docker build -t personas:1.0.1 .
+```
+
+## Construcción de Contenedor a partir de Imagen
+```bash
+docker run --rm  -p 8080:8080 \
+	-e API_SERVER_PORT=8080 \
+	-e DB_HOST=209.50.51.139 \
+	-e DB_PORT=3306 \
+	-e DB_USER=root \
+	-e DB_PASSWORD=clave_super_secreta \
+	-e DB_NAME=epi_bd \
+	-e DB_MAXIDLECONNS=10 \
+	-e DB_MAXOPENCONNS=10 \
+	--name micro \
+	personas:1.0.1
+```
